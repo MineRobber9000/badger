@@ -5,7 +5,9 @@ BOT = None
 
 def admin(event):
 	if BOT is None: return
-	if event.hostmask not in ADMIN_HOSTMASKS: return
+	if event.hostmask not in ADMIN_HOSTMASKS:
+		BOT.socket.send(IRCLine("PRIVMSG","#meta","You're not the boss of me! (hostmask {!s})".format(event.hostmask)).line)
+		return
 	if len(event.parts)==0: return
 	if event.parts[0]=="reload":
 		BOT.load_modules()
@@ -30,6 +32,7 @@ def on_invite(event):
 PASSWORD="whoops"
 try:
 	with open(".password") as f: PASSWORD=f.read().strip()
+except: pass
 def login(event):
 	BOT.socket.send(IRCLine("NS","IDENTIFY",PASSWORD).line)
 
