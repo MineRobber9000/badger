@@ -27,6 +27,7 @@ def on_privmsg(event):
 	if BOT is None: return
 	account = event.tags.get("account",None)
 	if account is None: return
+	if account in ("BitBot",): return # ignore BitBot
 	if not event.target.startswith("#"): return
 	if timeouts.get(event.target,0)==0:
 		badge_to_give = random.choices(list(badge_weights.keys()),list(badge_weights.values()))[0]
