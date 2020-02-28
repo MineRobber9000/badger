@@ -27,7 +27,7 @@ def on_privmsg(event):
 	if BOT is None: return
 	account = event.tags.get("account",None)
 	if account is None: return
-	if account in ("BitBot",): return # ignore BitBot
+	if account in ("BitBot","bensbots"): return # ignore BitBot
 	if not event.target.startswith("#"): return
 	if timeouts.get(event.target,0)==0:
 		badge_to_give = random.choices(list(badge_weights.keys()),list(badge_weights.values()))[0]
@@ -36,9 +36,9 @@ def on_privmsg(event):
 		population.value.give_badge(account,badge_to_give)
 		population.save("badges.json")
 		timeouts[event.target]=random.randint(20,50)
-	else:
+	elif timeouts.get(event.target,0)>0:
 		timeouts[event.target]-=1
-	if event.message=="!botlist":
+	if event.message=="!botlist" or event.message=="!rollcall":
 		respond(event,"Hi! I'm the badger! I give out badges randomly. "+("Commands you can use include 'listbadges' and 'transmute'." if account is not None else "To get started, log in to a services account! (/msg NickServ help)"))
 
 def on_cmd_help(event):
