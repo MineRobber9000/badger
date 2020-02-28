@@ -14,5 +14,5 @@ def on_privmsg(event):
 def register(bot):
 	global BOT
 	BOT=bot
-	bot.prefix="]"
+	bot.prefix="+"
 	bot.event_manager.on("privmsg",on_privmsg)
