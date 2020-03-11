@@ -32,14 +32,15 @@ def on_privmsg(event):
 	if timeouts.get(event.target,0)==0:
 		badge_to_give = random.choices(list(badge_weights.keys()),list(badge_weights.values()))[0]
 		if account not in population.value.badges:
-			BOT.socket.send(privmsg(event.hostmask.nick,f"Hey, you've got a badge! Badges are a nice way to show how active you are in channels like {event.target}. Type 'help' to see what you can do with these badges."))
+			BOT.socket.send(privmsg(event.hostmask.nick,f"Hey, you've got a badge! Badges are a nice way to show how active you are in channels like {event.target}. To see what you can do with these badges, respond 'help' to this message."))
+			BOT.socket.send(privmsg(event.hostmask.nick,"This will be the only time I contact you, unless you use commands here."))
 		population.value.give_badge(account,badge_to_give)
 		population.save("badges.json")
 		timeouts[event.target]=random.randint(20,50)
 	elif timeouts.get(event.target,0)>0:
 		timeouts[event.target]-=1
 	if event.message=="!botlist" or event.message=="!rollcall":
-		respond(event,"Hi! I'm the badger! I give out badges randomly. "+("Commands you can use include 'listbadges' and 'transmute'." if account is not None else "To get started, log in to a services account! (/msg NickServ help)"))
+		respond(event,"Hi! I'm the badger! I give out badges randomly. "+("Commands you can use include 'listbadges' and 'transmute'." if account is not None else "To get started, log in to a services account! (/msg NickServ help)")+" Source: https://ttm.sh/Eyx")
 
 def on_cmd_help(event):
 	if BOT is None: return
