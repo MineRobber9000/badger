@@ -59,7 +59,14 @@ class IRCLine:
 			prefix+=" "
 		if self.hostmask:
 			prefix+=":{} ".format(self.hostmask)
-		return prefix+" ".join([self.command]+self.params)+"\r\n"
+		# handle automatically adding a colon if the last parameter has spaces in it
+		parts = [self.command]
+		if self.params:
+			last_param = self.params[-1]
+			parts.extend(self.params[:-1])
+			if " " in last_param: last_param = ":"+last_param
+			parts.append(last_param)
+		return prefix+" ".join(parts)+"\r\n"
 	@classmethod
 	def parse_line(cls,line):
 		parts = line.split()
@@ -77,7 +84,7 @@ class IRCLine:
 			hostmask=parts.pop(0)[1:]
 		i=len(parts)-1
 		while i>0 and not parts[i].startswith(":"): i-=1
-		if i!=0: parts[i:]=[" ".join(parts[i:])]
+		if i!=0: parts[i:]=[" ".join(parts[i:])[1:]]
 		return cls(*parts,tags=tags,hostmask=hostmask)
 	def encode(self,*args,**kwargs):
 		# clearly, if we're here, I'm an idiot and am trying to send an
