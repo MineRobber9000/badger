@@ -3,6 +3,9 @@ from collections import defaultdict
 from math import tan, atan, pi, log
 import json
 
+class UserDoesntHaveEnoughBadges(Exception):
+	pass
+
 def quantile(x,m,p):
 	c=1-m
 	if x<=0.5: # x <= 1/2
@@ -67,7 +70,7 @@ class BadgePopulation:
 			for badge in self.badges[user]:
 				if badge.name==badge_name: found=True
 			if not found:
-				raise Exception(f"User {user} does not have a {badge_name}!")
+				raise UserDoesntHaveEnoughBadges(f"User {user} does not have a {badge_name}!")
 		rarities = calculate_rarities(self.population)
 		badges = [rarities[name][2] for name in badge_names]
 		badges.insert(0,1-_random.random())

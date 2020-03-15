@@ -1,7 +1,14 @@
-import plugin, badge, random, json, traceback
+import plugin, badge, random, json, traceback, requests, io, importlib
 from bot import IRCLine
 from collections import Counter
+importlib.reload(badge)
 BOT = None
+
+def pack_file(txt):
+	f = io.StringIO()
+	f.write(txt)
+	f.seek(0)
+	return {"file": ("tmp.txt",f,"text/plain")}
 
 class BadgePopData(plugin.Data):
 	def serialize(self):
@@ -76,10 +83,19 @@ def on_cmd_transmute(event):
 		return
 	try:
 		badge_result = population.value.transmute(account,*event.parts)
-	except:
-		traceback.print_exc()
+	except badge.UserDoesntHaveEnoughBadges:
 		respond(event,"You must have at least one (1) of each badge you wish to use in the transmutation.")
 		return
+	except:
+		url = "Error saving traceback! Tell khuxkm to check error.log!"
+		err = traceback.format_exc()
+		try:
+			with open("error.log","a") as f:
+				f.write(err+"\n"+("-"*80)+"\n")
+			r = requests.post("https://ttm.sh",files=pack_file(err))
+			url = r.text.strip()
+		except: pass
+		respond(event,"Something went wrong! Error: "+url)
 	respond(event,"You put in the {!s} badges above, and out pops a {}!".format(len(event.parts),badge_result))
 	population.value.give_badge(account,badge_result,False)
 	population.save("badges.json")
